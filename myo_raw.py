@@ -466,11 +466,12 @@ if __name__ == '__main__':
                 for ev in pygame.event.get():
                     if ev.type == QUIT or (ev.type == KEYDOWN and ev.unicode == 'q'):
                         raise KeyboardInterrupt()
-                    elif ev.type == KEYDOWN:
-                        if K_1 <= ev.key <= K_3:
-                            m.vibrate(ev.key - K_0)
-                        if K_KP1 <= ev.key <= K_KP3:
-                            m.vibrate(ev.key - K_KP0)
+                    ###disabled wierd vibrations
+                    #elif ev.type == KEYDOWN:
+                        #if K_1 <= ev.key <= K_3:
+                            #m.vibrate(ev.key - K_0)
+                        #if K_KP1 <= ev.key <= K_KP3:
+                            #m.vibrate(ev.key - K_KP0)
 
     except KeyboardInterrupt:
         pass
