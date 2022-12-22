@@ -279,6 +279,7 @@ class MyoRaw(object):
                 ## seems to indicate which sensors think they're being moved around or
                 ## something
                 emg = vals[:8]
+                ### emg holds electrode data from armband
                 moving = vals[8]
                 self.on_emg(emg, moving)
             elif attr == 0x1c:
@@ -449,9 +450,8 @@ if __name__ == '__main__':
         ## print framerate of received data
         times.append(time.time())
         if len(times) > 20:
-            #print((len(times) - 1) / (times[-1] - times[0]))
+            print((len(times) - 1) / (times[-1] - times[0]))
             times.pop(0)
-
     m.add_emg_handler(proc_emg)
     m.connect()
 
