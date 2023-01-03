@@ -6,6 +6,7 @@ import struct
 import sys
 import threading
 import time
+import os.path
 
 import serial
 from serial.tools.list_ports import comports
@@ -438,13 +439,18 @@ if __name__ == '__main__':
         pygame.display.flip()
         last_vals = vals
 
+    m = MyoRaw(sys.argv[1] if len(sys.argv) >= 2 else None)
+
+    ### locates /emg_data for saving txt files with emg data,
+    ### there must be a folder name emg_data in the same directory as myo_raw.py
+    txt_save_location = os.getcwd()
+    txt_save_location += '/emg_data'
+
     def init_txt_file():
-        init_txt = open('test.txt', 'w')
+        init_txt = open(os.path.join(txt_save_location,'test.txt'), 'w')
         init_txt.write('e1,e2,e3,e4,e5,e6,e7,e8\n')
         init_txt.close()
         print('txt file initialized')
-
-    m = MyoRaw(sys.argv[1] if len(sys.argv) >= 2 else None)
 
     def proc_emg(emg, moving, times=[]):
         ### no pygame in use, disabled for now
@@ -453,7 +459,7 @@ if __name__ == '__main__':
             #plot(scr, [e / 2000. for e in emg])
         #else:
         print(emg)
-        with open('test.txt', 'a') as emg_txt_data:
+        with open(os.path.join(txt_save_location,'test.txt'), 'a') as emg_txt_data:
             emg_txt_data.write(','.join(str(i) for i in emg))
             emg_txt_data.write('\n')
 
@@ -477,7 +483,7 @@ if __name__ == '__main__':
                 for ev in pygame.event.get():
                     if ev.type == QUIT or (ev.type == KEYDOWN and ev.unicode == 'q'):
                         raise KeyboardInterrupt()
-                    ###disabled wierd vibrations
+                    ### disabled wierd vibrations
                     #elif ev.type == KEYDOWN:
                         #if K_1 <= ev.key <= K_3:
                             #m.vibrate(ev.key - K_0)
