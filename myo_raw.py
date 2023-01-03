@@ -437,21 +437,32 @@ if __name__ == '__main__':
 
         pygame.display.flip()
         last_vals = vals
+        
+    def init_txt_file():
+        init_txt = open('test.txt', 'w')
+        init_txt.write('e1,e2,e3,e4,e5,e6,e7,e8\n')
+        init_txt.close()
+        print('txt file initialized')
 
     m = MyoRaw(sys.argv[1] if len(sys.argv) >= 2 else None)
 
     def proc_emg(emg, moving, times=[]):
-        if HAVE_PYGAME:
+        ### no pygame in use, disabled for now
+        #if HAVE_PYGAME:
             ## update pygame display
-            plot(scr, [e / 2000. for e in emg])
-        else:
-            print(emg)
+            #plot(scr, [e / 2000. for e in emg])
+        #else:
+        print(emg)
+        with open('test.txt', 'a') as emg_txt_data:
+            emg_txt_data.write(','.join(str(i) for i in emg))
+            emg_txt_data.write('\n')
 
         ## print framerate of received data
         times.append(time.time())
         if len(times) > 20:
             print((len(times) - 1) / (times[-1] - times[0]))
             times.pop(0)
+    init_txt_file()
     m.add_emg_handler(proc_emg)
     m.connect()
 
