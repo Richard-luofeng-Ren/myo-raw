@@ -1,4 +1,6 @@
 *~
 *.pyc
 *.dat
+*.txt
 .DS_Store
+emg_data/**
