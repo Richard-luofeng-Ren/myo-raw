@@ -471,7 +471,7 @@ if __name__ == '__main__':
     init_txt_file()
     m.add_emg_handler(proc_emg)
     m.connect()
-
+    print("ah")
     m.add_arm_handler(lambda arm, xdir: print('arm', arm, 'xdir', xdir))
     m.add_pose_handler(lambda p: print('pose', p))
 
