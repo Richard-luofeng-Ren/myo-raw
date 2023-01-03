@@ -447,7 +447,7 @@ if __name__ == '__main__':
     txt_save_location += '/emg_data'
 
     def init_txt_file():
-        init_txt = open(os.path.join(txt_save_location,'test.txt'), 'w')
+        init_txt = open(os.path.join(txt_save_location,'test2.txt'), 'w')
         init_txt.write('e1,e2,e3,e4,e5,e6,e7,e8\n')
         init_txt.close()
         print('txt file initialized')
@@ -495,4 +495,4 @@ if __name__ == '__main__':
     finally:
         m.disconnect()
         print()
-#sa
+
