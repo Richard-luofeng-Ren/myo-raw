@@ -273,6 +273,9 @@ class MyoRaw(object):
 
             c, attr, typ = unpack('BHB', p.payload[:4])
             pay = p.payload[5:]
+            
+            ### Payload can be printed for debuging purposes
+            #print(pay)
 
             if attr == 0x27:
                 vals = unpack('8HB', pay)
@@ -447,14 +450,14 @@ if __name__ == '__main__':
 
     m = MyoRaw(sys.argv[1] if len(sys.argv) >= 2 else None)
 
-    ### locates /emg_data for saving txt files with emg data,
+    ### locates /emg_data for saving csv files with emg data,
     ### there must be a folder name emg_data in the same directory as myo_raw.py
-    txt_save_location = os.getcwd()
-    txt_save_location += '/emg_data'
+    csv_save_location = os.getcwd()
+    csv_save_location += '/emg_data'
 
-    def init_txt_file():
+    def init_csv_file():
 
-        ### Creats new txt file using current date and time
+        ### Creats new csv file using current date and time
         file_time = time.localtime()
         global file_name
         file_name = 'EMG Scan '
@@ -470,11 +473,11 @@ if __name__ == '__main__':
         file_name += "m "
         file_name += str(file_time.tm_sec)
         file_name += "s"
-        file_name += '.txt'
-        init_txt = open(os.path.join(txt_save_location, file_name), 'w')
-        init_txt.write('time,e1,e2,e3,e4,e5,e6,e7,e8\n')
-        init_txt.close()
-        print('\ntxt file created, file name:', file_name,'\n')
+        file_name += '.csv'
+        init_csv = open(os.path.join(csv_save_location, file_name), 'w')
+        init_csv.write('time,e1,e2,e3,e4,e5,e6,e7,e8\n')
+        init_csv.close()
+        print('\ncsv file created, file name:', file_name,'\n')
 
     def proc_emg(emg, moving, times=[]):
         global frame_counter
@@ -491,11 +494,11 @@ if __name__ == '__main__':
         timestamp = str(round(secs_from_start, 3))
         timestamp += ','
 
-        ### Writes collected data to txt file
-        with open(os.path.join(txt_save_location,file_name), 'a') as emg_txt_data:
-                emg_txt_data.write(timestamp)
-                emg_txt_data.write(','.join(str(i) for i in emg))
-                emg_txt_data.write('\n')
+        ### Writes collected data to csv file
+        with open(os.path.join(csv_save_location,file_name), 'a') as emg_csv_data:
+                emg_csv_data.write(timestamp)
+                emg_csv_data.write(','.join(str(i) for i in emg))
+                emg_csv_data.write('\n')
 
         ### Status report every 1 second
         if secs_from_start - last_report_time > 1:
@@ -506,7 +509,7 @@ if __name__ == '__main__':
             frame_rate = round(frame_counter/(secs_from_start - last_report_time),2)
             print('frame rate:',frame_rate,'per second')
 
-            ### Reminder for the txt file name
+            ### Reminder for the csv file name
             print('data recorded in:', file_name,'\n')
 
             ### Original frame rate caluculation method, currently disabled
@@ -519,7 +522,7 @@ if __name__ == '__main__':
             last_report_time = secs_from_start
             frame_counter = 0
 
-    init_txt_file()
+    init_csv_file()
 
     ### Initializes frame counter used in frame rate calcs
     frame_counter = 0
@@ -553,5 +556,5 @@ if __name__ == '__main__':
         pass
     finally:
         m.disconnect()
-        print()
+        print('myo disconnected')
 
