@@ -325,6 +325,9 @@ class MyoRaw(object):
         self.write_attr(0x28, b'\x01\x00')
         self.write_attr(0x19, b'\x01\x03\x01\x01\x00')
         self.write_attr(0x19, b'\x01\x03\x01\x01\x01')
+        ### Adds a starting time for timestamp calculations
+        global start_time 
+        start_time = time.time()
 
     def mc_start_collection(self):
         '''Myo Connect sends this sequence (or a reordering) when starting data
@@ -447,8 +450,8 @@ if __name__ == '__main__':
     txt_save_location += '/emg_data'
 
     def init_txt_file():
-        init_txt = open(os.path.join(txt_save_location,'test2.txt'), 'w')
-        init_txt.write('e1,e2,e3,e4,e5,e6,e7,e8\n')
+        init_txt = open(os.path.join(txt_save_location,'test.txt'), 'w')
+        init_txt.write('time,e1,e2,e3,e4,e5,e6,e7,e8\n')
         init_txt.close()
         print('txt file initialized')
 
@@ -459,7 +462,11 @@ if __name__ == '__main__':
             #plot(scr, [e / 2000. for e in emg])
         #else:
         print(emg)
+        time_from_start = str(round(time.time() - start_time, 3))
+        time_from_start += ','
+        print(time_from_start)
         with open(os.path.join(txt_save_location,'test.txt'), 'a') as emg_txt_data:
+            emg_txt_data.write(time_from_start)
             emg_txt_data.write(','.join(str(i) for i in emg))
             emg_txt_data.write('\n')
 
@@ -468,7 +475,10 @@ if __name__ == '__main__':
         if len(times) > 20:
             print((len(times) - 1) / (times[-1] - times[0]))
             times.pop(0)
+
     init_txt_file()
+
+
     m.add_emg_handler(proc_emg)
     m.connect()
 
