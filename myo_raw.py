@@ -325,9 +325,11 @@ class MyoRaw(object):
         self.write_attr(0x28, b'\x01\x00')
         self.write_attr(0x19, b'\x01\x03\x01\x01\x00')
         self.write_attr(0x19, b'\x01\x03\x01\x01\x01')
+
         ### Adds a starting time for timestamp calculations
         global start_time 
         start_time = time.time()
+        print('\n---------------------------------------Data Collection Starts---------------------------------------\n')
 
     def mc_start_collection(self):
         '''Myo Connect sends this sequence (or a reordering) when starting data
@@ -442,6 +444,7 @@ if __name__ == '__main__':
         pygame.display.flip()
         last_vals = vals
 
+
     m = MyoRaw(sys.argv[1] if len(sys.argv) >= 2 else None)
 
     ### locates /emg_data for saving txt files with emg data,
@@ -450,33 +453,79 @@ if __name__ == '__main__':
     txt_save_location += '/emg_data'
 
     def init_txt_file():
-        init_txt = open(os.path.join(txt_save_location,'test.txt'), 'w')
+
+        ### Creats new txt file using current date and time
+        file_time = time.localtime()
+        global file_name
+        file_name = 'EMG Scan '
+        file_name += str(file_time.tm_year)
+        file_name += "_"
+        file_name += str(file_time.tm_mon)
+        file_name += "_"
+        file_name += str(file_time.tm_mday)
+        file_name += " "
+        file_name += str(file_time.tm_hour)
+        file_name += "h "
+        file_name += str(file_time.tm_min)
+        file_name += "m "
+        file_name += str(file_time.tm_sec)
+        file_name += "s"
+        file_name += '.txt'
+        init_txt = open(os.path.join(txt_save_location, file_name), 'w')
         init_txt.write('time,e1,e2,e3,e4,e5,e6,e7,e8\n')
         init_txt.close()
-        print('txt file initialized')
+        print('\ntxt file created, file name:', file_name,'\n')
 
     def proc_emg(emg, moving, times=[]):
+        global frame_counter
+        global last_report_time
+        global file_name
         ### no pygame in use, disabled for now
         #if HAVE_PYGAME:
             ## update pygame display
             #plot(scr, [e / 2000. for e in emg])
         #else:
-        print(emg)
-        time_from_start = str(round(time.time() - start_time, 3))
-        time_from_start += ','
-        print(time_from_start)
-        with open(os.path.join(txt_save_location,'test.txt'), 'a') as emg_txt_data:
-            emg_txt_data.write(time_from_start)
-            emg_txt_data.write(','.join(str(i) for i in emg))
-            emg_txt_data.write('\n')
 
-        ## print framerate of received data
-        times.append(time.time())
-        if len(times) > 20:
-            print((len(times) - 1) / (times[-1] - times[0]))
-            times.pop(0)
+        frame_counter += 1
+        secs_from_start = time.time() - start_time
+        timestamp = str(round(secs_from_start, 3))
+        timestamp += ','
+
+        ### Writes collected data to txt file
+        with open(os.path.join(txt_save_location,file_name), 'a') as emg_txt_data:
+                emg_txt_data.write(timestamp)
+                emg_txt_data.write(','.join(str(i) for i in emg))
+                emg_txt_data.write('\n')
+
+        ### Status report every 1 second
+        if secs_from_start - last_report_time > 1:
+            print('EMG output:',emg)
+            print('elapsed time:',timestamp.replace(',',''),'seconds')
+
+            ### Frame rate calculations:
+            frame_rate = round(frame_counter/(secs_from_start - last_report_time),2)
+            print('frame rate:',frame_rate,'per second')
+
+            ### Reminder for the txt file name
+            print('data recorded in:', file_name,'\n')
+
+            ### Original frame rate caluculation method, currently disabled
+            #times.append(time.time())
+            #if len(times) > 20:
+                #print((len(times) - 1) / (times[-1] - times[0]))
+                #times.pop(0)
+
+            ### Resets report time and frame counter
+            last_report_time = secs_from_start
+            frame_counter = 0
 
     init_txt_file()
+
+    ### Initializes frame counter used in frame rate calcs
+    frame_counter = 0
+
+    ### Records time when last data collection report was made
+    last_report_time = 0
 
 
     m.add_emg_handler(proc_emg)
@@ -506,4 +555,3 @@ if __name__ == '__main__':
         m.disconnect()
         print()
 
-#sa
