@@ -275,8 +275,11 @@ class MyoRaw(object):
             pay = p.payload[5:]
             
             ### Payload can be printed for debuging purposes
-            #print(pay)
+            #print(p.payload)
+            #print(attr)
 
+            ### Three types of data can be recieved from myo armband, EMG, IMU and on arm notifications
+            ### EMG and IMU data are sent alternately, while on arm notifications are only sent occationaly
             if attr == 0x27:
                 vals = unpack('8HB', pay)
                 ## not entirely sure what the last byte is, but it's a bitmask that
@@ -286,22 +289,24 @@ class MyoRaw(object):
                 ### emg holds electrode data from armband
                 moving = vals[8]
                 self.on_emg(emg, moving)
-            elif attr == 0x1c:
-                vals = unpack('10h', pay)
-                quat = vals[:4]
-                acc = vals[4:7]
-                gyro = vals[7:10]
-                self.on_imu(quat, acc, gyro)
-            elif attr == 0x23:
-                typ, val, xdir = unpack('3B', pay)
-
-                if typ == 1: # on arm
-                    self.on_arm(Arm(val), XDirection(xdir))
-                elif typ == 2: # removed from arm
-                    self.on_arm(Arm.UNKNOWN, XDirection.UNKNOWN)
-                elif typ == 3: # pose
-                    self.on_pose(Pose(val))
-            else:
+                
+            ### On arm notifications and IMG are disabled, not required in study condiitions
+            ### Also on arm detection appears to be quite inaccurate, at least for our armband
+            #elif attr == 0x1c:
+                #vals = unpack('10h', pay)
+                #quat = vals[:4]
+                #acc = vals[4:7]
+                #gyro = vals[7:10]
+                #self.on_imu(quat, acc, gyro)
+            #elif attr == 0x23:
+                #typ, val, xdir, d, e, f = unpack('6B', pay)
+                #if typ == 1: # on arm
+                    #self.on_arm(Arm(val), XDirection(xdir))
+                #elif typ == 2: # removed from arm
+                    #self.on_arm(Arm.UNKNOWN, XDirection.UNKNOWN)
+                #elif typ == 3: # pose
+                    #self.on_pose(Pose(val))
+            elif attr != 0x1c and attr != 0x23:
                 print('data with unknown attr: %02X %s' % (attr, p))
 
         self.bt.add_handler(handle_data)
@@ -529,7 +534,6 @@ if __name__ == '__main__':
 
     ### Records time when last data collection report was made
     last_report_time = 0
-
 
     m.add_emg_handler(proc_emg)
     m.connect()
