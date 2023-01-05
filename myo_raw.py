@@ -556,5 +556,5 @@ if __name__ == '__main__':
         pass
     finally:
         m.disconnect()
-        print('myo disconnected')
+        print('\nmyo disconnected')
 
