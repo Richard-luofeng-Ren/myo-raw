@@ -186,6 +186,8 @@ class MyoRaw(object):
 
     def detect_tty(self):
         for p in comports():
+            print(p[0])
+            print(type(p[0]))
             if re.search(r'PID=2458:0*1', p[2]):
                 print('using device:', p[0])
                 return p[0]
@@ -289,7 +291,7 @@ class MyoRaw(object):
                 ### emg holds electrode data from armband
                 moving = vals[8]
                 self.on_emg(emg, moving)
-                
+
             ### On arm notifications and IMG are disabled, not required in study condiitions
             ### Also on arm detection appears to be quite inaccurate, at least for our armband
             #elif attr == 0x1c:
