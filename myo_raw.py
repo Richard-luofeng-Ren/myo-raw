@@ -416,45 +416,6 @@ class MyoRaw(object):
 
 
 if __name__ == '__main__':
-    try:
-        import pygame
-        from pygame.locals import *
-        HAVE_PYGAME = True
-    except ImportError:
-        HAVE_PYGAME = False
-
-    if HAVE_PYGAME:
-        w, h = 1200, 400
-        scr = pygame.display.set_mode((w, h))
-
-    last_vals = None
-    def plot(scr, vals):
-        DRAW_LINES = False
-
-        global last_vals
-        if last_vals is None:
-            last_vals = vals
-            return
-
-        D = 5
-        scr.scroll(-D)
-        scr.fill((0,0,0), (w - D, 0, w, h))
-        for i, (u, v) in enumerate(zip(last_vals, vals)):
-            if DRAW_LINES:
-                pygame.draw.line(scr, (0,255,0),
-                                 (w - D, int(h/8 * (i+1 - u))),
-                                 (w, int(h/8 * (i+1 - v))))
-                pygame.draw.line(scr, (255,255,255),
-                                 (w - D, int(h/8 * (i+1))),
-                                 (w, int(h/8 * (i+1))))
-            else:
-                c = int(255 * max(0, min(1, v)))
-                scr.fill((c, c, c), (w - D, i * h / 8, D, (i + 1) * h / 8 - i * h / 8));
-
-        pygame.display.flip()
-        last_vals = vals
-
-
     m = MyoRaw(sys.argv[1] if len(sys.argv) >= 2 else None)
 
     ### locates /emg_data for saving csv files with emg data,
@@ -490,11 +451,6 @@ if __name__ == '__main__':
         global frame_counter
         global last_report_time
         global file_name
-        ### no pygame in use, disabled for now
-        #if HAVE_PYGAME:
-            ## update pygame display
-            #plot(scr, [e / 2000. for e in emg])
-        #else:
 
         frame_counter += 1
         secs_from_start = time.time() - start_time
@@ -546,18 +502,7 @@ if __name__ == '__main__':
     try:
         while True:
             m.run(1)
-
-            if HAVE_PYGAME:
-                for ev in pygame.event.get():
-                    if ev.type == QUIT or (ev.type == KEYDOWN and ev.unicode == 'q'):
-                        raise KeyboardInterrupt()
-                    ### disabled wierd vibrations
-                    #elif ev.type == KEYDOWN:
-                        #if K_1 <= ev.key <= K_3:
-                            #m.vibrate(ev.key - K_0)
-                        #if K_KP1 <= ev.key <= K_KP3:
-                            #m.vibrate(ev.key - K_KP0)
-
+            
     except KeyboardInterrupt:
         pass
     finally:
