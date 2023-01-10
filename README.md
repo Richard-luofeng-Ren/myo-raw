@@ -1,12 +1,11 @@
 # Overview
 
-This project provides an interface to communicate with the Thalmic Myo,
-providing the ability to scan for and connect to a nearby Myo, and giving access
-to data from the EMG sensors and the IMU. For Myo firmware v1.0 and up, access
+This project is an adaptation of the myo-raw project by dzhu, which provides an interface to communicate with the Thalmic Myo, the ability to scan for and connect to a nearby Myo, and giving access to data from the EMG sensors and the IMU. For Myo firmware v1.0 and up, access
 to the output of Thalmic's own gesture recognition is also available.
 
-The code is primarily developed on Linux and has been tested on Windows and
-MacOS.
+This adaptation is primarily focused on saving recorded data from myo armband in an accessible format.
+
+The code for the original myo-raw project is primarily developed on Linux and has been tested on Windows and MacOS. This adapted version is developed on MacOS and haven't been tested on other systems.
 
 Thanks to Jeff Rowberg's example bglib implementations
 (https://github.com/jrowberg/bglib/), which helped me get started with
@@ -14,13 +13,14 @@ understanding the protocol.
 
 
 # Requirements
-
 - python >=2.6
 - pySerial
 - enum34 (for Python <3.4)
-- pygame, for the example visualization and classifier program
+
+# Additional requirements to run classify_myo
 - numpy, for the classifier program
 - sklearn, for a more efficient classifier (and easy access to smarter classifiers)
+
 
 
 # Dongle device name
@@ -44,14 +44,11 @@ automatically, but if that doesn't work, here's how to find it out manually:
 
 # Included files
 
-## myo_raw.py (access to EMG/IMU data)
+## myo_raw.py (access to EMG/IMU data) - *Run this to get data*
 
 myo_raw.py contains the MyoRaw class, which implements the communication
-protocol with a Myo. If run as a standalone script, it provides a graphical
-display of EMG readings as they come in. A command-line argument is interpreted
-as the device name for the dongle; no argument means to auto-detect. You can
-also press 1, 2, or 3 on the keyboard to make the Myo perform a short, medium,
-or long vibration.
+protocol with a Myo. If run as a standalone script, it saves raw EMG data from myo armband as .csv files in the emg_data directory. A command-line argument is interpreted
+as the device name for the dongle; no argument means to auto-detect. Ability to manually send vibrations is disabled, although the myo armband is designed to vibrate automatically in some conditions.
 
 To process the data yourself, you can call MyoRaw.add_emg_handler or
 MyoRaw.add_imu_handler; see the code for examples.
