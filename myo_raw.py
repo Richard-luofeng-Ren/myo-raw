@@ -263,8 +263,8 @@ class MyoRaw(object):
 
             ## enable IMU data
             self.write_attr(0x1d, b'\x01\x00')
-            ## enable on/off arm notifications
-            self.write_attr(0x24, b'\x02\x00')
+            ## on/off arm notifications, currently disabled, write '\x02\x00' instead to enable
+            self.write_attr(0x24, b'\x01\x00')
 
             # self.write_attr(0x19, b'\x01\x03\x00\x01\x01')
             self.start_raw()
@@ -502,7 +502,7 @@ if __name__ == '__main__':
     try:
         while True:
             m.run(1)
-            
+
     except KeyboardInterrupt:
         pass
     finally:
